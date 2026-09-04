@@ -9,7 +9,8 @@ import {
   Trash2, Camera, TrendingUp, AlertTriangle, ChevronRight, ChevronLeft,
   Utensils, ShoppingCart, Car, ShoppingBag, Film, Zap, HeartPulse, Plane,
   Building2, Tag, Calendar, DollarSign, ArrowUpDown, Store, UserPlus,
-  Sparkles, ArrowRight,
+  Sparkles, ArrowRight, Copy, Percent, Gift, Flame, Trophy, Target,
+  Coins, Lightbulb, PartyPopper,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -67,6 +68,11 @@ const monthLabel = (key) => {
   return new Date(Number(y), Number(m) - 1, 1).toLocaleDateString(undefined, { month: "short" });
 };
 
+function roundUpTo(amount, nearest) {
+  const rounded = Math.ceil(amount / nearest) * nearest;
+  return { rounded, spare: Math.round((rounded - amount) * 100) / 100 };
+}
+
 function uid() {
   return Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
 }
@@ -120,6 +126,23 @@ const seedBudgets = () => ({
   food: 400, groceries: 350, transport: 150, shopping: 250, entertainment: 120,
   bills: 300, health: 150, travel: 200, housing: 1000, other: 100,
 });
+
+const seedCoupons = () => [
+  { id: uid(), brand: "FreshMart", color: "#7C9A82", category: "groceries", code: "FRESH20", discount: "20% off groceries", detail: "Min. spend $40 · valid on all orders", expiresInDays: 6 },
+  { id: uid(), brand: "Corner Bistro", color: "#BE4B32", category: "food", code: "BISTRO10", discount: "10% off + free dessert", detail: "Dine-in only", expiresInDays: 12 },
+  { id: uid(), brand: "City Cabs", color: "#3D6B8A", category: "transport", code: "RIDE5", discount: "$5 cashback on rides", detail: "Up to 3 rides per week", expiresInDays: 3 },
+  { id: uid(), brand: "Thread & Co", color: "#B98A3E", category: "shopping", code: "THREAD15", discount: "15% off new arrivals", detail: "Excludes sale items", expiresInDays: 20 },
+  { id: uid(), brand: "Lumière Cinema", color: "#8A5C9E", category: "entertainment", code: "MOVIE2FOR1", discount: "2-for-1 tickets", detail: "Tuesdays & Wednesdays only", expiresInDays: 9 },
+  { id: uid(), brand: "CityPower Co", color: "#C79226", category: "bills", code: "POWERSAVE", discount: "$8 bill credit", detail: "Auto-pay enrollment required", expiresInDays: 15 },
+  { id: uid(), brand: "Wellness Pharmacy", color: "#A44A5C", category: "health", code: "WELL10", discount: "10% off wellness items", detail: "Vitamins & supplements", expiresInDays: 30 },
+  { id: uid(), brand: "SkyLine Air", color: "#356B5D", category: "travel", code: "FLYAWAY", discount: "$30 off flights $200+", detail: "Domestic routes only", expiresInDays: 25 },
+];
+
+const seedChallenges = () => [
+  { id: uid(), title: "No-Spend Weekend", desc: "Skip discretionary spending for 2 days straight.", goal: 60, saved: 24, streak: 2, active: true, icon: "flame" },
+  { id: uid(), title: "Coffee Run Cutback", desc: "Skip 3 café visits this week and save the difference.", goal: 30, saved: 10, streak: 1, active: false, icon: "target" },
+  { id: uid(), title: "Save $100 this month", desc: "Set aside a little from every paycheck.", goal: 100, saved: 45, streak: 6, active: false, icon: "trophy" },
+];
 
 const seedContacts = () => [
   { id: uid(), name: "Priya Nair", color: "#BE4B32" },
@@ -378,6 +401,55 @@ const GlobalStyle = () => (
 
     input[type="date"].input { font-family: 'Inter', sans-serif; }
     ::-webkit-scrollbar { width: 0; height: 0; }
+
+    /* Coupons */
+    .coupon-card {
+      display: flex; align-items: stretch; background: var(--card); border: 1px solid var(--line);
+      border-radius: 10px; overflow: hidden; margin-bottom: 12px;
+    }
+    .coupon-brand {
+      width: 56px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 700; font-size: 15px; position: relative;
+    }
+    .coupon-brand::after {
+      content: ''; position: absolute; right: -1px; top: 0; bottom: 0; width: 0;
+      border-right: 2px dashed rgba(255,255,255,0.55);
+    }
+    .coupon-body { flex: 1; padding: 12px 14px; min-width: 0; }
+    .coupon-discount { font-weight: 700; font-size: 14.5px; }
+    .coupon-detail { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .coupon-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+    .coupon-code {
+      font-family: 'Fraunces', serif; font-weight: 600; font-size: 13.5px; letter-spacing: 0.04em;
+      border: 1.5px dashed var(--line-strong); border-radius: 6px; padding: 4px 9px; background: var(--paper);
+    }
+    .coupon-expiry { font-size: 11px; color: var(--rust); font-weight: 600; }
+    .copy-btn {
+      display: flex; align-items: center; gap: 5px; background: var(--ink); color: var(--paper);
+      border: none; border-radius: 6px; padding: 6px 10px; font-size: 12px; font-weight: 700; cursor: pointer;
+    }
+    .copy-btn.copied { background: var(--sage); }
+
+    /* Round-up */
+    .tip-banner {
+      display: flex; gap: 10px; align-items: flex-start; background: rgba(217,154,52,0.14);
+      border: 1px solid rgba(217,154,52,0.4); border-radius: 10px; padding: 12px 13px; margin-top: 14px;
+    }
+    .tip-banner b { color: var(--amber-dark); }
+    .roundup-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; }
+    .roundup-old { color: var(--text-muted); text-decoration: line-through; font-size: 12.5px; }
+    .roundup-new { font-weight: 700; }
+    .roundup-spare { color: var(--sage); font-weight: 700; font-size: 13px; margin-left: auto; }
+
+    /* Challenges */
+    .streak-badge {
+      display: inline-flex; align-items: center; gap: 5px; background: var(--ink); color: var(--paper);
+      border-radius: 20px; padding: 5px 12px; font-weight: 700; font-size: 13px;
+    }
+    .progress-track { height: 9px; background: var(--line); border-radius: 6px; overflow: hidden; margin-top: 10px; }
+    .progress-fill { height: 100%; background: var(--sage); border-radius: 6px; transition: width .3s ease; }
+    .challenge-card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-bottom: 14px; }
+    .challenge-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; flex-shrink: 0; }
   `}</style>
 );
 
@@ -439,6 +511,11 @@ function ExpenseEntryScreen({ onSave, editing, onCancelEdit }) {
 
   const valid = parseFloat(amount) > 0 && category && date;
 
+  const parsedAmount = parseFloat(amount);
+  const roundSuggestion = parsedAmount > 0 && parsedAmount % 1 !== 0
+    ? roundUpTo(parsedAmount, parsedAmount < 20 ? 1 : 5)
+    : null;
+
   const handleSave = () => {
     if (!valid) return;
     onSave({
@@ -493,6 +570,16 @@ function ExpenseEntryScreen({ onSave, editing, onCancelEdit }) {
           autoFocus
         />
       </div>
+
+      {roundSuggestion && (
+        <div className="tip-banner">
+          <Lightbulb size={17} color="var(--amber-dark)" style={{ flexShrink: 0, marginTop: 1 }} />
+          <div style={{ fontSize: 13, lineHeight: 1.4 }}>
+            Pay <b>{fmtMoney(roundSuggestion.rounded)}</b> instead of {fmtMoney(parsedAmount)} and stash the{" "}
+            <b>{fmtMoney(roundSuggestion.spare)}</b> change in savings.
+          </div>
+        </div>
+      )}
 
       <div className="section-block" style={{ marginTop: 4 }}>
         <span className="field-label">Category</span>
@@ -1192,6 +1279,271 @@ function ContactsScreen({ contacts, setContacts }) {
 }
 
 /* ------------------------------------------------------------------ */
+/*  Screen: Coupons & Cashback                                          */
+/* ------------------------------------------------------------------ */
+
+const COUPON_FILTERS = ["all", "food", "groceries", "transport", "shopping", "entertainment", "bills", "health", "travel"];
+
+function CouponsScreen({ coupons }) {
+  const [filter, setFilter] = useState("all");
+  const [copiedId, setCopiedId] = useState(null);
+
+  const visible = filter === "all" ? coupons : coupons.filter((c) => c.category === filter);
+
+  const copyCode = async (coupon) => {
+    try {
+      await navigator.clipboard.writeText(coupon.code);
+    } catch (e) {
+      /* clipboard may be unavailable; UI still confirms visually */
+    }
+    setCopiedId(coupon.id);
+    setTimeout(() => setCopiedId((id) => (id === coupon.id ? null : id)), 1600);
+  };
+
+  return (
+    <div className="screen">
+      <div className="stat-hero" style={{ marginBottom: 18 }}>
+        <div className="stat-hero-label">Available offers</div>
+        <div className="stat-hero-amount num">{coupons.length}</div>
+        <div style={{ fontSize: 12.5, opacity: 0.8, marginTop: 6 }}>
+          across {new Set(coupons.map((c) => c.category)).size} categories
+        </div>
+      </div>
+
+      <div style={{ display: "flex", gap: 8, overflowX: "auto", paddingBottom: 4, marginBottom: 16 }}>
+        {COUPON_FILTERS.map((f) => (
+          <button
+            key={f}
+            className={`chip-toggle ${filter === f ? "active" : ""}`}
+            style={{ flexShrink: 0 }}
+            onClick={() => setFilter(f)}
+          >
+            {f === "all" ? "All brands" : catById(f).label}
+          </button>
+        ))}
+      </div>
+
+      {visible.length === 0 && (
+        <div className="empty-state"><Gift size={30} /><div>No offers in this category yet</div></div>
+      )}
+
+      {visible.map((c) => (
+        <div className="coupon-card" key={c.id}>
+          <div className="coupon-brand" style={{ background: c.color }}>
+            {c.brand.split(" ").map((w) => w[0]).join("").slice(0, 2)}
+          </div>
+          <div className="coupon-body">
+            <div className="coupon-discount">{c.discount}</div>
+            <div className="coupon-detail">{c.brand} · {c.detail}</div>
+            <div className="coupon-footer">
+              <span className="coupon-code">{c.code}</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <span className="coupon-expiry">{c.expiresInDays}d left</span>
+                <button className={`copy-btn ${copiedId === c.id ? "copied" : ""}`} onClick={() => copyCode(c)}>
+                  {copiedId === c.id ? <Check size={13} /> : <Copy size={13} />}
+                  {copiedId === c.id ? "Copied" : "Copy"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Screen: Round-Up Savings                                            */
+/* ------------------------------------------------------------------ */
+
+function RoundUpScreen({ expenses }) {
+  const [nearest, setNearest] = useState(1);
+  const [autoRoundUp, setAutoRoundUp] = useState(true);
+
+  const now = new Date();
+  const curKey = monthKey(now);
+  const thisMonthExpenses = expenses.filter((e) => monthKey(e.date) === curKey);
+
+  const roundUps = useMemo(() => {
+    return thisMonthExpenses
+      .map((e) => ({ expense: e, ...roundUpTo(e.amount, nearest) }))
+      .filter((r) => r.spare > 0.004)
+      .sort((a, b) => b.spare - a.spare);
+  }, [thisMonthExpenses, nearest]);
+
+  const totalSpare = roundUps.reduce((a, r) => a + r.spare, 0);
+
+  return (
+    <div className="screen">
+      <div className="stat-hero" style={{ marginBottom: 18 }}>
+        <div className="stat-hero-label">Spare change saved this month</div>
+        <div className="stat-hero-amount num">{fmtMoney(totalSpare)}</div>
+        <div style={{ fontSize: 12.5, opacity: 0.8, marginTop: 6 }}>
+          from {roundUps.length} rounded-up purchases
+        </div>
+      </div>
+
+      <div className="tip-banner">
+        <Coins size={17} color="var(--amber-dark)" style={{ flexShrink: 0, marginTop: 1 }} />
+        <div style={{ fontSize: 13, lineHeight: 1.4 }}>
+          Pay bills in round figures and let the leftover change go straight into savings —
+          small amounts add up fast.
+        </div>
+      </div>
+
+      <div className="section-block">
+        <span className="field-label">Round up to nearest</span>
+        <div className="segmented">
+          <button className={nearest === 1 ? "active" : ""} onClick={() => setNearest(1)}>$1</button>
+          <button className={nearest === 5 ? "active" : ""} onClick={() => setNearest(5)}>$5</button>
+          <button className={nearest === 10 ? "active" : ""} onClick={() => setNearest(10)}>$10</button>
+        </div>
+      </div>
+
+      <div className="section-block card" style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontWeight: 700, fontSize: 14 }}>Auto round-up recommendations</div>
+          <div style={{ fontSize: 12.5, color: "var(--text-muted)", marginTop: 2 }}>
+            Show a savings tip every time you log a new expense
+          </div>
+        </div>
+        <button
+          onClick={() => setAutoRoundUp((v) => !v)}
+          style={{
+            width: 46, height: 26, borderRadius: 20, border: "none", cursor: "pointer",
+            background: autoRoundUp ? "var(--ink)" : "var(--line-strong)", position: "relative", flexShrink: 0,
+          }}
+        >
+          <span style={{
+            position: "absolute", top: 3, left: autoRoundUp ? 23 : 3, width: 20, height: 20, borderRadius: "50%",
+            background: "#fff", transition: "left .15s ease",
+          }} />
+        </button>
+      </div>
+
+      <div className="section-block">
+        <div className="section-title">This month's round-ups</div>
+        <div className="card" style={{ padding: "4px 16px" }}>
+          {roundUps.length === 0 && (
+            <div className="empty-state" style={{ padding: "20px 10px" }}>
+              No spare change yet — expenses with whole-dollar amounts won't round up.
+            </div>
+          )}
+          {roundUps.map((r) => (
+            <div key={r.expense.id} className="dashed-row roundup-row">
+              <CategoryIcon id={r.expense.category} size={15} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 600, fontSize: 13.5 }}>{r.expense.merchant}</div>
+                <div style={{ fontSize: 11.5 }}>
+                  <span className="roundup-old num">{fmtMoney(r.expense.amount)}</span>{" "}
+                  → <span className="roundup-new num">{fmtMoney(r.rounded)}</span>
+                </div>
+              </div>
+              <span className="roundup-spare num">+{fmtMoney(r.spare)}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Screen: Challenges & Streaks                                        */
+/* ------------------------------------------------------------------ */
+
+const CHALLENGE_ICONS = { flame: Flame, target: Target, trophy: Trophy };
+
+function ChallengesScreen({ challenges, setChallenges }) {
+  const [celebrate, setCelebrate] = useState(null);
+
+  const startChallenge = (id) => {
+    setChallenges((cs) => cs.map((c) => (c.id === id ? { ...c, active: true } : c)));
+  };
+
+  const logToday = (id) => {
+    setChallenges((cs) => cs.map((c) => {
+      if (c.id !== id) return c;
+      const nextSaved = Math.min(c.goal, Math.round((c.saved + c.goal * 0.12) * 100) / 100);
+      return { ...c, streak: c.streak + 1, saved: nextSaved };
+    }));
+    setCelebrate(id);
+    setTimeout(() => setCelebrate(null), 1800);
+  };
+
+  const active = challenges.filter((c) => c.active);
+  const suggestions = challenges.filter((c) => !c.active);
+  const bestStreak = Math.max(0, ...challenges.map((c) => c.streak));
+
+  return (
+    <div className="screen">
+      <div className="stat-hero" style={{ marginBottom: 18 }}>
+        <div className="stat-hero-label">Longest active streak</div>
+        <div className="stat-hero-amount num" style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+          {bestStreak}<span style={{ fontSize: 16, fontWeight: 500 }}>days</span>
+        </div>
+      </div>
+
+      {active.length > 0 && (
+        <div className="section-block">
+          <div className="section-title">Your active challenges</div>
+          {active.map((c) => {
+            const Icon = CHALLENGE_ICONS[c.icon] || Flame;
+            const pct = Math.min(100, Math.round((c.saved / c.goal) * 100));
+            return (
+              <div className="challenge-card" key={c.id}>
+                <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                  <div className="challenge-icon" style={{ background: "var(--ink)" }}><Icon size={17} /></div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700, fontSize: 15 }}>{c.title}</div>
+                    <div style={{ fontSize: 12.5, color: "var(--text-muted)", marginTop: 2 }}>{c.desc}</div>
+                  </div>
+                  <span className="streak-badge"><Flame size={13} /> {c.streak}d</span>
+                </div>
+                <div className="progress-track"><div className="progress-fill" style={{ width: `${pct}%` }} /></div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 12.5, color: "var(--text-muted)" }}>
+                  <span className="num">{fmtMoney(c.saved)} of {fmtMoney(c.goal)}</span>
+                  <span>{pct}%</span>
+                </div>
+                {celebrate === c.id ? (
+                  <div className="tip-banner" style={{ marginTop: 12 }}>
+                    <PartyPopper size={16} color="var(--amber-dark)" />
+                    <div style={{ fontSize: 13 }}>Nice work — streak extended to <b>{c.streak} days</b>!</div>
+                  </div>
+                ) : (
+                  <button className="btn btn-amber" style={{ width: "100%", marginTop: 12 }} onClick={() => logToday(c.id)}>
+                    <Flame size={15} /> Log today & extend streak
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {suggestions.length > 0 && (
+        <div className="section-block">
+          <div className="section-title">More challenges to try</div>
+          {suggestions.map((c) => {
+            const Icon = CHALLENGE_ICONS[c.icon] || Target;
+            return (
+              <div className="challenge-card" key={c.id} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                <div className="challenge-icon" style={{ background: "var(--sage)" }}><Icon size={17} /></div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 700, fontSize: 14.5 }}>{c.title}</div>
+                  <div style={{ fontSize: 12.5, color: "var(--text-muted)", marginTop: 2 }}>{c.desc}</div>
+                </div>
+                <button className="btn btn-ghost btn-sm" onClick={() => startChallenge(c.id)}>Start</button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /*  Screen: Home Dashboard                                              */
 /* ------------------------------------------------------------------ */
 
@@ -1373,6 +1725,9 @@ function MoreScreen({ onNavigate }) {
     { key: "split", label: "Split expense", desc: "Divide costs with others", icon: Split },
     { key: "contacts", label: "Contacts", desc: "Manage people you split with", icon: Users },
     { key: "budget", label: "Budget setup", desc: "Set category limits", icon: PiggyBank },
+    { key: "coupons", label: "Coupons & cashback", desc: "Brand offers to cut spending", icon: Gift },
+    { key: "roundup", label: "Round-up savings", desc: "Turn spare change into savings", icon: Coins },
+    { key: "challenges", label: "Challenges & streaks", desc: "Save more, build a streak", icon: Flame },
   ];
   return (
     <div className="screen">
@@ -1407,6 +1762,9 @@ const SCREEN_META = {
   receipt: { title: "Receipt review", subtitle: () => "Scan & confirm", back: "more" },
   split: { title: "Split expense", subtitle: () => "Share with contacts", back: "more" },
   contacts: { title: "Contacts", subtitle: () => "People you split with", back: "more" },
+  coupons: { title: "Coupons & cashback", subtitle: () => "Save on every brand", back: "more" },
+  roundup: { title: "Round-up savings", subtitle: () => "Spare change, real savings", back: "more" },
+  challenges: { title: "Challenges & streaks", subtitle: () => "Stay consistent, save more", back: "more" },
 };
 
 export default function App() {
@@ -1414,6 +1772,8 @@ export default function App() {
   const [expenses, setExpenses] = useState(seedExpenses);
   const [budgets, setBudgets] = useState(seedBudgets);
   const [contacts, setContacts] = useState(seedContacts);
+  const [coupons] = useState(seedCoupons);
+  const [challenges, setChallenges] = useState(seedChallenges);
   const [detailExpense, setDetailExpense] = useState(null);
   const [toast, setToast] = useState(null);
 
@@ -1478,10 +1838,18 @@ export default function App() {
           <ContactsScreen contacts={contacts} setContacts={setContacts} />
         )}
 
+        {screen === "coupons" && <CouponsScreen coupons={coupons} />}
+
+        {screen === "roundup" && <RoundUpScreen expenses={expenses} />}
+
+        {screen === "challenges" && (
+          <ChallengesScreen challenges={challenges} setChallenges={setChallenges} />
+        )}
+
         <div className="tabbar">
           {TABS.map((t) => {
             const Icon = t.icon;
-            const active = screen === t.key || (t.key === "more" && ["budget", "receipt", "split", "contacts"].includes(screen));
+            const active = screen === t.key || (t.key === "more" && ["budget", "receipt", "split", "contacts", "coupons", "roundup", "challenges"].includes(screen));
             if (t.isFab) {
               return (
                 <button key={t.key} className="tab-btn" onClick={() => setScreen("entry")}>
