@@ -8,8 +8,8 @@ import {
   Users, Split, ArrowLeft, Search, SlidersHorizontal, X, Check, Pencil,
   Trash2, Camera, TrendingUp, AlertTriangle, ChevronRight, ChevronLeft,
   Utensils, ShoppingCart, Car, ShoppingBag, Film, Zap, HeartPulse, Plane,
-  Building2, Tag, Calendar, DollarSign, ArrowUpDown, Store, UserPlus,
-  Sparkles, ArrowRight,
+  Building2, Upload, Tag, Calendar, DollarSign, ArrowUpDown, Store, UserPlus,
+  Sparkles, Download, ArrowRight,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -162,23 +162,27 @@ const GlobalStyle = () => (
     }
     .ledger-shell {
       width: 100%;
-      max-width: 430px;
-      min-height: 100vh;
+      max-width: 1200px;      /* Laptop width */
+      min-height: calc(100vh - 48px);
+
       background: var(--paper);
-      position: relative;
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.12);
+
+      overflow: hidden;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 0 60px rgba(0,0,0,0.12);
-      overflow-x: hidden;
     }
     .num { font-family: 'Fraunces', serif; font-variant-numeric: tabular-nums; }
 
     .topbar {
-      position: sticky; top: 0; z-index: 20;
-      background: var(--paper);
-      padding: 18px 20px 14px;
-      border-bottom: 1px solid var(--line);
-    }
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: #FAF7EF;   /* lighter */
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid #E8E1CC;
+}
     .topbar-row { display: flex; align-items: center; gap: 12px; }
     .back-btn {
       width: 34px; height: 34px; border-radius: 50%;
@@ -197,6 +201,26 @@ const GlobalStyle = () => (
       border: 1px solid var(--line);
       border-radius: 10px;
       padding: 16px;
+    }
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    @media (min-width: 900px) {
+      .dashboard-grid {
+        grid-template-columns: 1.2fr 0.8fr;
+        align-items: start;
+      }
+
+      .screen {
+        padding: 28px;
+      }
+
+      .topbar {
+        padding: 24px 28px 18px;
+      }
     }
 
     .btn {
@@ -247,9 +271,21 @@ const GlobalStyle = () => (
     }
 
     .tabbar {
-      position: sticky; bottom: 0; z-index: 30;
-      background: var(--card); border-top: 1px solid var(--line);
-      display: flex; padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+
+      width: 100%;
+      max-width: 1100px;      
+      margin: 0 auto;
+
+      z-index: 1000;
+      background: var(--card);
+      border-top: 1px solid var(--line);
+
+      display: flex;
+      padding: 8px 6px calc(8px + env(safe-area-inset-bottom));
     }
     .tab-btn {
       flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
@@ -378,6 +414,101 @@ const GlobalStyle = () => (
 
     input[type="date"].input { font-family: 'Inter', sans-serif; }
     ::-webkit-scrollbar { width: 0; height: 0; }
+    /* Hidden on mobile */
+.desktop-navbar {
+  display: none;
+}
+
+/* Bottom tab visible on mobile */
+.tabbar {
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 430px;
+  margin: 0 auto;
+}
+
+/* Laptop/Desktop */
+@media (min-width: 1024px) {
+  .desktop-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 32px;
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .nav-logo {
+    font-family: "Fraunces", serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 12px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .nav-item.active {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  /* Hide mobile bottom bar */
+  .tabbar {
+    display: none;
+  }
+
+  /* Remove extra bottom padding */
+  .screen {
+    padding-bottom: 28px;
+  }
+}
+  /* Mobile: show TopBar, hide desktop navbar */
+.mobile-header {
+  display: block;
+}
+
+.desktop-navbar {
+  display: none;
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  .mobile-header {
+    display: none;
+  }
+
+  .desktop-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 32px;
+    background: var(--card);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .tabbar {
+    display: none;
+  }
+}
   `}</style>
 );
 
@@ -390,10 +521,11 @@ function TopBar({ title, subtitle, onBack }) {
     <div className="topbar">
       <div className="topbar-row">
         {onBack && (
-          <button className="back-btn" onClick={onBack} aria-label="Back">
+          <button className="back-btn" onClick={onBack}>
             <ArrowLeft size={17} />
           </button>
         )}
+
         <div>
           <div className="topbar-title">{title}</div>
           {subtitle && <div className="topbar-sub">{subtitle}</div>}
@@ -601,30 +733,86 @@ function ExpenseListScreen({ expenses, onOpenExpense }) {
     (filters.from ? 1 : 0) + (filters.to ? 1 : 0) + filters.categories.length +
     (filters.min ? 1 : 0) + (filters.max ? 1 : 0);
 
+  const exportCSV = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/api/export/csv");
+
+      const blob = await response.blob();
+
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "expenses.csv";
+      a.click();
+
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      alert("CSV export failed");
+      console.error(err);
+    }
+  };
+
   return (
     <div className="screen">
+      {/* Export button */}
+      <button
+        className="btn btn-ghost"
+        style={{ width: "100%", marginBottom: 12 }}
+        onClick={exportCSV}
+      >
+        <Download size={16} />
+        Export CSV
+      </button>
+
+      {/* Sort + Filter */}
       <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
-        <select className="input" style={{ flex: 1 }} value={sortBy} onChange={(e) => setSortBy(e.target.value)}>
+        <select
+          className="input"
+          style={{ flex: 1 }}
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value)}
+        >
           <option value="date-desc">Newest first</option>
           <option value="date-asc">Oldest first</option>
           <option value="amount-desc">Amount: High to low</option>
           <option value="amount-asc">Amount: Low to high</option>
         </select>
+
         <button
           className="btn btn-ghost btn-sm"
           style={{ position: "relative", flexShrink: 0 }}
-          onClick={() => { setDraftFilters(filters); setShowFilters(true); }}
+          onClick={() => {
+            setDraftFilters(filters);
+            setShowFilters(true);
+          }}
         >
-          <SlidersHorizontal size={15} /> Filter
+          <SlidersHorizontal size={15} />
+          Filter
+
           {activeFilterCount > 0 && (
-            <span style={{
-              position: "absolute", top: -6, right: -6, background: "var(--rust)", color: "#fff",
-              borderRadius: "50%", width: 18, height: 18, fontSize: 10, display: "flex",
-              alignItems: "center", justifyContent: "center", fontWeight: 700,
-            }}>{activeFilterCount}</span>
+            <span
+              style={{
+                position: "absolute",
+                top: -6,
+                right: -6,
+                background: "var(--rust)",
+                color: "#fff",
+                borderRadius: "50%",
+                width: 18,
+                height: 18,
+                fontSize: 10,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontWeight: 700,
+              }}
+            >
+              {activeFilterCount}
+            </span>
           )}
         </button>
-      </div>
+  </div>
 
       <div className="card" style={{ padding: "4px 16px" }}>
         {pageItems.length === 0 && (
@@ -804,16 +992,108 @@ function ExpenseDetailModal({ expense, onClose, onSave, onDelete }) {
 /*  Screen: Budget setup                                                */
 /* ------------------------------------------------------------------ */
 
-function BudgetSetupScreen({ budgets, onSave }) {
+function BudgetRing({ spent, budget }) {
+  const percentage = Math.min((spent / Math.max(budget, 1)) * 100, 100);
+
+  const color =
+    percentage < 70
+      ? "#16A34A"      // Green
+      : percentage < 90
+      ? "#F59E0B"      // Amber
+      : "#DC2626";     // Red
+
+  const radius = 50;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (percentage / 100) * circumference;
+
+  return (
+    <div style={{ display: "flex", justifyContent: "center", marginBottom: 18 }}>
+      <svg width="130" height="130">
+        <circle
+          cx="65"
+          cy="65"
+          r={radius}
+          stroke="#E5E7EB"
+          strokeWidth="10"
+          fill="none"
+        />
+
+        <circle
+          cx="65"
+          cy="65"
+          r={radius}
+          stroke={color}
+          strokeWidth="10"
+          fill="none"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          transform="rotate(-90 65 65)"
+        />
+
+        <text
+          x="65"
+          y="60"
+          textAnchor="middle"
+          fontSize="20"
+          fontWeight="700"
+          fill={color}
+        >
+          {Math.round(percentage)}%
+        </text>
+
+        <text
+          x="65"
+          y="78"
+          textAnchor="middle"
+          fontSize="9"
+          fill="#666"
+        >
+          USED
+        </text>
+      </svg>
+    </div>
+  );
+}
+
+function BudgetSetupScreen({ budgets, expenses, onSave }) {
   const [draft, setDraft] = useState(budgets);
   const [saved, setSaved] = useState(false);
+
+  const totalBudget = Object.values(draft).reduce(
+    (sum, value) => sum + Number(value || 0),
+    0
+  );
+
+  const currentMonth = new Date().toISOString().slice(0, 7); // "2026-09"
+
+  const totalSpent = expenses
+    .filter(exp => exp.date.startsWith(currentMonth))
+    .reduce((sum, exp) => sum + exp.amount, 0);
+
   const total = Object.values(draft).reduce((a, b) => a + (parseFloat(b) || 0), 0);
 
   return (
     <div className="screen">
       <div className="stat-hero" style={{ marginBottom: 20 }}>
-        <div className="stat-hero-label">Total monthly budget</div>
-        <div className="stat-hero-amount num">{fmtMoney(total)}</div>
+
+        <BudgetRing
+          spent={totalSpent}
+          budget={totalBudget}
+        />
+
+        <div className="stat-hero-label">
+          Monthly Spending
+        </div>
+
+        <div className="stat-hero-amount num">
+          {fmtMoney(totalSpent)}
+        </div>
+
+        <div style={{ opacity: 0.8, marginTop: 4 }}>
+          of {fmtMoney(totalBudget)} budget
+        </div>
+
       </div>
 
       <span className="section-title">Set a limit per category</span>
@@ -858,6 +1138,23 @@ function BudgetSetupScreen({ budgets, onSave }) {
 function ReceiptReviewScreen({ onConfirm }) {
   const [scanned, setScanned] = useState(null);
   const [confirmed, setConfirmed] = useState(false);
+  const [receiptImage, setReceiptImage] = useState(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mobile =
+      /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+    setIsMobile(mobile);
+  }, []);
+
+  const handleImage = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setConfirmed(false);
+    setReceiptImage(URL.createObjectURL(file));
+    simulateScan();
+  };
 
   const simulateScan = () => {
     const cat = CATEGORIES[Math.floor(Math.random() * (CATEGORIES.length - 1))];
@@ -870,9 +1167,24 @@ function ReceiptReviewScreen({ onConfirm }) {
     const subtotal = items.reduce((a, b) => a + parseFloat(b.price), 0);
     const tax = subtotal * 0.08;
     setScanned({
-      merchant, category: cat.id, date: new Date().toISOString().slice(0, 10),
-      items, subtotal: subtotal.toFixed(2), tax: tax.toFixed(2),
+      merchant,
+      merchantConfidence: 0.62,
+
+      category: cat.id,
+
+      date: new Date().toISOString().slice(0,10),
+      dateConfidence: 0.95,
+
       total: (subtotal + tax).toFixed(2),
+      totalConfidence: 0.58,
+
+      items: items.map((i, index) => ({
+        ...i,
+        confidence: index === 1 ? 0.55 : 0.96
+      })),
+
+      subtotal: subtotal.toFixed(2),
+      tax: tax.toFixed(2)
     });
     setConfirmed(false);
   };
@@ -883,16 +1195,81 @@ function ReceiptReviewScreen({ onConfirm }) {
     return (
       <div className="screen">
         <div className="empty-state" style={{ paddingTop: 40 }}>
+
           <Camera size={40} />
-          <div style={{ fontWeight: 700, color: "var(--text)", fontSize: 17, fontFamily: "'Fraunces', serif" }}>
+
+          <div
+            style={{
+              fontWeight: 700,
+              color: "var(--text)",
+              fontSize: 17,
+              fontFamily: "'Fraunces', serif",
+            }}
+          >
             Scan a receipt
           </div>
-          <div style={{ fontSize: 13.5, marginTop: 6, maxWidth: 260, marginInline: "auto" }}>
+
+          <div
+            style={{
+              fontSize: 13.5,
+              marginTop: 6,
+              maxWidth: 260,
+              marginInline: "auto",
+              color: "var(--muted)"
+            }}
+          >
             Snap a photo and we'll pull out the merchant, date, and total for you to review.
           </div>
-          <button className="btn btn-amber" style={{ marginTop: 22 }} onClick={simulateScan}>
-            <Camera size={16} /> Simulate scan
-          </button>
+
+          <div style={{ display: "flex", gap: 10, marginTop: 22 }}>
+
+            {isMobile && (
+              <label
+                className="btn btn-amber"
+                style={{ flex: 1, justifyContent: "center" }}
+              >
+                <Camera size={16} />
+                Take Photo
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  hidden
+                  onChange={handleImage}
+                />
+              </label>
+            )}
+
+            <label
+              className={isMobile ? "btn btn-ghost" : "btn btn-amber"}
+              style={{ flex: 1, justifyContent: "center" }}
+            >
+              <Upload size={16} />
+              Upload Receipt
+
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={handleImage}
+              />
+            </label>
+
+          </div>
+
+          {receiptImage && (
+            <img
+              src={receiptImage}
+              alt="Receipt Preview"
+              style={{
+                width: "100%",
+                marginTop: 20,
+                borderRadius: 10,
+                border: "1px solid var(--line)"
+              }}
+            />
+          )}
         </div>
       </div>
     );
@@ -907,7 +1284,15 @@ function ReceiptReviewScreen({ onConfirm }) {
           <div style={{ color: "var(--text-muted)", fontSize: 14, marginTop: 6, maxWidth: 260 }}>
             Added to your expenses from {scanned.merchant}.
           </div>
-          <button className="btn btn-primary" style={{ marginTop: 24, width: 220 }} onClick={() => setScanned(null)}>
+          <button
+            className="btn btn-primary"
+            style={{ marginTop: 24, width: 220 }}
+            onClick={() => {
+              setScanned(null);
+              setReceiptImage(null);
+              setConfirmed(false);
+            }}
+          >
             Scan another
           </button>
         </div>
@@ -927,15 +1312,67 @@ function ReceiptReviewScreen({ onConfirm }) {
         <div style={{ textAlign: "center", marginBottom: 14 }}>
           <input
             className="input"
-            style={{ textAlign: "center", fontFamily: "'Fraunces', serif", fontWeight: 600, fontSize: 17, border: "none", background: "transparent" }}
+            style={{
+              textAlign: "center",
+              fontFamily: "'Fraunces', serif",
+              fontWeight: 600,
+              fontSize: 17,
+              background: "transparent",
+              border:
+                scanned.merchantConfidence < 0.8
+                  ? "2px solid #F59E0B"
+                  : "1px solid var(--line-strong)"
+            }}
             value={scanned.merchant}
             onChange={(e) => updateField("merchant", e.target.value)}
           />
+          {scanned.merchantConfidence < 0.8 && (
+            <div style={{
+              color:"#B45309",
+              fontSize:12,
+              marginTop:4
+            }}>
+              Low confidence • Please verify
+            </div>
+          )}
         </div>
         {scanned.items.map((it, idx) => (
-          <div key={idx} style={{ display: "flex", justifyContent: "space-between", fontSize: 13.5, padding: "5px 0", color: "var(--text-muted)" }}>
-            <span>{it.name}</span>
-            <span className="num">${it.price}</span>
+          <div key={idx} style={{ marginBottom: 10 }}>
+
+            <input
+              className="input"
+              value={it.name}
+              onChange={(e) => {
+                const updated = [...scanned.items];
+                updated[idx].name = e.target.value;
+                updateField("items", updated);
+              }}
+              style={{
+                marginBottom: 6,
+                border:
+                  it.confidence < 0.8
+                    ? "2px solid #F59E0B"
+                    : "1px solid var(--line-strong)"
+              }}
+            />
+
+            <input
+              type="number"
+              className="input"
+              value={it.price}
+              onChange={(e) => {
+                const updated = [...scanned.items];
+                updated[idx].price = e.target.value;
+                updateField("items", updated);
+              }}
+            />
+
+            {it.confidence < 0.8 && (
+              <small style={{ color: "#B45309" }}>
+                OCR uncertain
+              </small>
+            )}
+
           </div>
         ))}
         <div style={{ borderTop: "1px dashed var(--line-strong)", marginTop: 8, paddingTop: 8, display: "flex", justifyContent: "space-between", fontSize: 13.5 }}>
@@ -964,16 +1401,22 @@ function ReceiptReviewScreen({ onConfirm }) {
         <button className="btn btn-ghost" style={{ flex: 1 }} onClick={() => setScanned(null)}>Discard</button>
         <button
           className="btn btn-primary"
-          style={{ flex: 1 }}
           onClick={() => {
             onConfirm({
-              id: uid(), amount: parseFloat(scanned.total), category: scanned.category,
-              date: scanned.date, merchant: scanned.merchant, notes: "From scanned receipt", isAnomaly: false,
+              id: uid(),
+              amount: parseFloat(scanned.total),
+              category: scanned.category,
+              date: scanned.date,
+              merchant: scanned.merchant,
+              notes: "From scanned receipt",
+              isAnomaly: false,
             });
+
+            
             setConfirmed(true);
           }}
         >
-          Confirm & save
+          Confirm & Save
         </button>
       </div>
     </div>
@@ -984,129 +1427,149 @@ function ReceiptReviewScreen({ onConfirm }) {
 /*  Screen: Split Expense                                               */
 /* ------------------------------------------------------------------ */
 
-function SplitExpenseScreen({ expenses, contacts, onSplitSaved }) {
-  const [expenseId, setExpenseId] = useState(expenses[0]?.id || "");
-  const [selectedContacts, setSelectedContacts] = useState([]);
-  const [splitType, setSplitType] = useState("even");
-  const [customAmounts, setCustomAmounts] = useState({});
+function SplitExpenseScreen({ contacts, onSplitSaved }) {
   const [saved, setSaved] = useState(false);
 
-  const expense = expenses.find((e) => e.id === expenseId);
-  const includeMe = true;
-  const participantCount = selectedContacts.length + (includeMe ? 1 : 0);
+  const [selectedContacts, setSelectedContacts] = useState([]);
 
-  const evenShare = expense && participantCount > 0 ? expense.amount / participantCount : 0;
-
-  const customTotal = Object.values(customAmounts).reduce((a, b) => a + (parseFloat(b) || 0), 0);
-  const remaining = expense ? expense.amount - customTotal : 0;
+  const [lineItems, setLineItems] = useState([
+    { id: 1, name: "Burger", price: 180, assignedTo: "me" },
+    { id: 2, name: "Fries", price: 90, assignedTo: "me" },
+    { id: 3, name: "Coke", price: 60, assignedTo: "me" },
+  ]);
 
   const toggleContact = (id) => {
-    setSelectedContacts((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+    setSelectedContacts((prev) =>
+      prev.includes(id)
+        ? prev.filter((x) => x !== id)
+        : [...prev, id]
+    );
   };
 
-  if (!expense) {
-    return (
-      <div className="screen">
-        <div className="empty-state">
-          <Split size={34} />
-          <div style={{ fontWeight: 700, color: "var(--text)" }}>No expenses to split</div>
-          <div style={{ fontSize: 13, marginTop: 4 }}>Add an expense first.</div>
-        </div>
-      </div>
+  const people = [
+    { id: "me", name: "You" },
+    ...contacts.filter((c) => selectedContacts.includes(c.id)),
+  ];
+
+  const assignItem = (itemId, personId) => {
+    setLineItems((items) =>
+      items.map((item) =>
+        item.id === itemId
+          ? { ...item, assignedTo: personId }
+          : item
+      )
     );
-  }
+  };
+
+  const totals = people.map((person) => ({
+    ...person,
+    total: lineItems
+      .filter((i) => i.assignedTo === person.id)
+      .reduce((sum, i) => sum + i.price, 0),
+  }));
 
   return (
     <div className="screen">
-      <span className="field-label">Expense to split</span>
-      <select className="input" value={expenseId} onChange={(e) => setExpenseId(e.target.value)} style={{ marginBottom: 18 }}>
-        {expenses.map((e) => (
-          <option key={e.id} value={e.id}>{e.merchant} · {fmtMoney(e.amount)} · {fmtDateShort(e.date)}</option>
-        ))}
-      </select>
-
-      <div className="card" style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-        <CategoryIcon id={expense.category} />
-        <div style={{ flex: 1 }}>
-          <div style={{ fontWeight: 700 }}>{expense.merchant}</div>
-          <div style={{ fontSize: 12.5, color: "var(--text-muted)" }}>{fmtDate(expense.date)}</div>
-        </div>
-        <div className="num" style={{ fontWeight: 700, fontSize: 18 }}>{fmtMoney(expense.amount)}</div>
-      </div>
+      <div className="section-title">Split Expense</div>
 
       <span className="field-label">Split with</span>
+
       <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 18 }}>
         {contacts.map((c) => (
-          <button key={c.id} className={`chip-toggle ${selectedContacts.includes(c.id) ? "active" : ""}`} onClick={() => toggleContact(c.id)}>
-            <span className="avatar" style={{ width: 20, height: 20, fontSize: 9, background: c.color }}>
-              {c.name.split(" ").map((n) => n[0]).join("").slice(0, 2)}
-            </span>
+          <button
+            key={c.id}
+            className={`chip-toggle ${selectedContacts.includes(c.id) ? "active" : ""}`}
+            onClick={() => toggleContact(c.id)}
+          >
             {c.name}
           </button>
         ))}
       </div>
 
-      <span className="field-label">Split method</span>
-      <div className="segmented" style={{ marginBottom: 18 }}>
-        <button className={splitType === "even" ? "active" : ""} onClick={() => setSplitType("even")}>Split evenly</button>
-        <button className={splitType === "custom" ? "active" : ""} onClick={() => setSplitType("custom")}>Custom amounts</button>
-      </div>
-
-      {selectedContacts.length === 0 && (
+      {selectedContacts.length === 0 ? (
         <div className="empty-state" style={{ padding: "20px 10px" }}>
-          Select at least one contact to split this expense with.
+          Select at least one contact
         </div>
-      )}
+      ) : (
+        <>
+          <div className="section-block">
+            <div className="section-title">Assign Line Items</div>
 
-      {selectedContacts.length > 0 && splitType === "even" && (
-        <div className="card">
-          <div className="dashed-row" style={{ display: "flex", justifyContent: "space-between", padding: "10px 0" }}>
-            <span style={{ fontWeight: 600, fontSize: 14 }}>You</span>
-            <span className="num" style={{ fontWeight: 700 }}>{fmtMoney(evenShare)}</span>
-          </div>
-          {selectedContacts.map((id) => {
-            const c = contacts.find((x) => x.id === id);
-            return (
-              <div className="dashed-row" key={id} style={{ display: "flex", justifyContent: "space-between", padding: "10px 0" }}>
-                <span style={{ fontWeight: 600, fontSize: 14 }}>{c.name}</span>
-                <span className="num" style={{ fontWeight: 700 }}>{fmtMoney(evenShare)}</span>
+            {lineItems.map((item) => (
+              <div key={item.id} className="card" style={{ marginBottom: 10 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    marginBottom: 10,
+                  }}
+                >
+                  <strong>{item.name}</strong>
+                  <span>${item.price}</span>
+                </div>
+
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                  {people.map((person) => (
+                    <button
+                      key={person.id}
+                      className={`chip-toggle ${
+                        item.assignedTo === person.id ? "active" : ""
+                      }`}
+                      onClick={() => assignItem(item.id, person.id)}
+                    >
+                      {person.name}
+                    </button>
+                  ))}
+                </div>
               </div>
-            );
-          })}
-        </div>
-      )}
-
-      {selectedContacts.length > 0 && splitType === "custom" && (
-        <div className="card">
-          {selectedContacts.map((id) => {
-            const c = contacts.find((x) => x.id === id);
-            return (
-              <div className="dashed-row" key={id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 0" }}>
-                <span style={{ flex: 1, fontWeight: 600, fontSize: 14 }}>{c.name}</span>
-                <input
-                  type="number"
-                  className="input"
-                  style={{ width: 90, padding: "8px 8px" }}
-                  placeholder="$0.00"
-                  value={customAmounts[id] || ""}
-                  onChange={(e) => setCustomAmounts((a) => ({ ...a, [id]: e.target.value }))}
-                />
-              </div>
-            );
-          })}
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0 0", fontSize: 13, fontWeight: 600, color: remaining < 0 ? "var(--rust)" : "var(--text-muted)" }}>
-            <span>Remaining for you</span>
-            <span className="num">{fmtMoney(remaining)}</span>
+            ))}
           </div>
-        </div>
+
+          <div className="section-block">
+            <div className="section-title">Per Person Total</div>
+
+            <div className="card">
+              {totals.map((person) => (
+                <div
+                  key={person.id}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: "10px 0",
+                    borderBottom: "1px dashed var(--line)",
+                  }}
+                >
+                  <span>{person.name}</span>
+                  <strong>${person.total.toFixed(2)}</strong>
+                </div>
+              ))}
+            </div>
+
+            <button
+              className="btn btn-primary"
+              style={{ marginTop: 16 }}
+              onClick={() => {
+                const text = totals
+                  .map((p) => `${p.name}: $${p.total.toFixed(2)}`)
+                  .join("\n");
+
+                navigator.clipboard.writeText(text);
+                setSaved(true);
+                onSplitSaved();
+              }}
+            >
+              Share as Text
+            </button>
+          </div>
+        </>
       )}
 
-      {selectedContacts.length > 0 && (
-        <button className="btn btn-primary" style={{ marginTop: 20 }} onClick={() => { onSplitSaved(); setSaved(true); }}>
-          Save split
-        </button>
+      {saved && (
+        <Toast
+          message="Split copied!"
+          onDone={() => setSaved(false)}
+        />
       )}
-      {saved && <Toast message="Split saved" onDone={() => setSaved(false)} />}
     </div>
   );
 }
@@ -1237,7 +1700,10 @@ function DashboardScreen({ expenses, budgets, onNavigate }) {
 
   return (
     <div className="screen">
-      <div className="stat-hero">
+      <div className="dashboard-grid">
+
+      
+      <div className="stat-hero lg:p-8 lg:min-h-[1000px]:">
         <div className="stat-hero-label">Spent this month</div>
         <div className="stat-hero-amount num">{fmtMoney(totalThisMonth)}</div>
         <div style={{ fontSize: 12.5, opacity: 0.8, marginTop: 6 }}>
@@ -1273,7 +1739,7 @@ function DashboardScreen({ expenses, budgets, onNavigate }) {
             <div className="empty-state" style={{ padding: "20px 10px" }}>No expenses logged this month yet.</div>
           ) : (
             <>
-              <ResponsiveContainer width="100%" height={190}>
+              <ResponsiveContainer width="100%" height={160}>
                 <PieChart>
                   <Pie data={pieData} dataKey="value" nameKey="name" innerRadius={48} outerRadius={78} paddingAngle={2}>
                     {pieData.map((d, i) => <Cell key={i} fill={d.color} stroke="var(--card)" strokeWidth={2} />)}
@@ -1359,6 +1825,7 @@ function DashboardScreen({ expenses, budgets, onNavigate }) {
       <button className="btn btn-ghost" style={{ marginTop: 22 }} onClick={() => onNavigate("list")}>
         View all expenses <ArrowRight size={15} />
       </button>
+      </div>
     </div>
   );
 }
@@ -1374,17 +1841,29 @@ function MoreScreen({ onNavigate }) {
     { key: "contacts", label: "Contacts", desc: "Manage people you split with", icon: Users },
     { key: "budget", label: "Budget setup", desc: "Set category limits", icon: PiggyBank },
   ];
+
   return (
     <div className="screen">
       <div className="more-grid">
         {items.map((it) => {
           const Icon = it.icon;
           return (
-            <div key={it.key} className="more-card" onClick={() => onNavigate(it.key)}>
-              <div className="more-icon"><Icon size={18} /></div>
+            <div
+              key={it.key}
+              className="more-card"
+              onClick={() => onNavigate(it.key)}
+            >
+              <div className="more-icon lg:w-14 lg:h-14">
+                <Icon className="w-5 h-5 lg:w-8 lg:h-8" />
+              </div>
+
               <div>
-                <div style={{ fontWeight: 700, fontSize: 14.5 }}>{it.label}</div>
-                <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>{it.desc}</div>
+                <h3 className="text-lg lg:text-xl font-bold text-[#1B3A2B]">
+                  {it.label}
+                </h3>
+                <p className="text-sm lg:text-base text-gray-600 mt-1">
+                  {it.desc}
+                </p>
               </div>
             </div>
           );
@@ -1416,6 +1895,7 @@ export default function App() {
   const [contacts, setContacts] = useState(seedContacts);
   const [detailExpense, setDetailExpense] = useState(null);
   const [toast, setToast] = useState(null);
+  const [activeTab, setActiveTab] = useState("home");
 
   const addOrUpdateExpense = (exp) => {
     setExpenses((list) => {
@@ -1439,11 +1919,51 @@ export default function App() {
     <div className="ledger-app">
       <GlobalStyle />
       <div className="ledger-shell">
-        <TopBar
-          title={meta.title}
-          subtitle={meta.subtitle()}
-          onBack={meta.back ? () => setScreen(meta.back) : undefined}
-        />
+        {/* Mobile Header */}
+  <div className="mobile-header">
+    <TopBar
+      title="Ledger"
+      subtitle="Personal Expense Tracker"
+    />
+  </div>
+
+  <div className="desktop-navbar">
+  <div className="nav-logo">Ledger</div>
+
+  <div className="nav-links">
+    <button
+      className={`nav-item ${screen === "home" ? "active" : ""}`}
+      onClick={() => setScreen("home")}
+    >
+      <Home size={18} />
+      Home
+    </button>
+
+    <button
+      className={`nav-item ${screen === "list" ? "active" : ""}`}
+      onClick={() => setScreen("list")}
+    >
+      <ListOrdered size={18} />
+      Expenses
+    </button>
+
+    <button
+      className={`nav-item ${screen === "entry" ? "active" : ""}`}
+      onClick={() => setScreen("entry")}
+    >
+      <PlusCircle size={18} />
+      Add Expense
+    </button>
+
+    <button
+      className={`nav-item ${screen === "more" ? "active" : ""}`}
+      onClick={() => setScreen("more")}
+    >
+      <MoreHorizontal size={18} />
+      More
+    </button>
+  </div>
+</div>
 
         {screen === "home" && <DashboardScreen expenses={expenses} budgets={budgets} onNavigate={setScreen} />}
 
@@ -1460,7 +1980,7 @@ export default function App() {
 
         {screen === "more" && <MoreScreen onNavigate={setScreen} />}
 
-        {screen === "budget" && <BudgetSetupScreen budgets={budgets} onSave={setBudgets} />}
+        {screen === "budget" && <BudgetSetupScreen budgets={budgets} expenses={expenses} onSave={setBudgets} />}
 
         {screen === "receipt" && (
           <ReceiptReviewScreen onConfirm={(exp) => addOrUpdateExpense(exp)} />
@@ -1468,7 +1988,6 @@ export default function App() {
 
         {screen === "split" && (
           <SplitExpenseScreen
-            expenses={expenses}
             contacts={contacts}
             onSplitSaved={() => {}}
           />

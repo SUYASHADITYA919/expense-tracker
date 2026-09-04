@@ -1,3 +1,4 @@
+@import "tailwindcss";
 :root {
   --text: #6b6375;
   --text-h: #08060d;
@@ -52,6 +53,19 @@
 
 body {
   margin: 0;
+  font-family: Inter, sans-serif;
+
+  background:
+    radial-gradient(circle at top right, #E9DFC8 0%, transparent 30%),
+    radial-gradient(circle at bottom left, #E3D7BE 0%, transparent 35%),
+    #D9D0BC;
+
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 28px;
 }
 
 #root {
