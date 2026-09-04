@@ -8,9 +8,7 @@ import {
   Users, Split, ArrowLeft, Search, SlidersHorizontal, X, Check, Pencil,
   Trash2, Camera, TrendingUp, AlertTriangle, ChevronRight, ChevronLeft,
   Utensils, ShoppingCart, Car, ShoppingBag, Film, Zap, HeartPulse, Plane,
-  Building2, Upload, Tag, Calendar, DollarSign, ArrowUpDown, Store, UserPlus,
-  Sparkles, Download, ArrowRight,
-  Building2, Tag, Calendar, DollarSign, ArrowUpDown, Store, UserPlus,
+  Building2, Upload, Tag, Download, Calendar, DollarSign, ArrowUpDown, Store, UserPlus,
   Sparkles, ArrowRight, Copy, Percent, Gift, Flame, Trophy, Target,
   Coins, Lightbulb, PartyPopper,
 } from "lucide-react";
